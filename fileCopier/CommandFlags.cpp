@@ -1,7 +1,7 @@
 #include "CommandFlags.h"
 #include <ctype.h>
 
-// Структура для работы с командами, которую будут разделять потоки
+// РЎС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РєРѕРјР°РЅРґР°РјРё, РєРѕС‚РѕСЂСѓСЋ Р±СѓРґСѓС‚ СЂР°Р·РґРµР»СЏС‚СЊ РїРѕС‚РѕРєРё
 CommandFlags::CommandFlags(initializer_list<char> list) {
 	for (char ch : list) {
 		commandFlags[toupper(ch)] = false;

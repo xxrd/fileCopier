@@ -1,7 +1,7 @@
 #include "util.h"
 #include <Windows.h>
 
-// Очищает консоль
+// РћС‡РёС‰Р°РµС‚ РєРѕРЅСЃРѕР»СЊ
 void clear() {
 	COORD topLeft = { 0, 0 };
 	HANDLE console = GetStdHandle(STD_OUTPUT_HANDLE);

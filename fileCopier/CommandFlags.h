@@ -5,13 +5,13 @@
 
 using namespace std;
 
-// Соответствие символов команде
+// РЎРѕРѕС‚РІРµС‚СЃС‚РІРёРµ СЃРёРјРІРѕР»РѕРІ РєРѕРјР°РЅРґРµ
 struct Commands {
 	static const char stopCopying = 'Q';
 	static const char continueCopying = 'R';
 };
 
-// Структура для работы с командами, которую будут разделять потоки
+// РЎС‚СЂСѓРєС‚СѓСЂР° РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РєРѕРјР°РЅРґР°РјРё, РєРѕС‚РѕСЂСѓСЋ Р±СѓРґСѓС‚ СЂР°Р·РґРµР»СЏС‚СЊ РїРѕС‚РѕРєРё
 class CommandFlags {
 private:
 	mutex commandsFlagsMutex;

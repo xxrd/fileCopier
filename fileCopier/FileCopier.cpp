@@ -6,7 +6,7 @@
 #include <conio.h>
 #include <thread>
 
-// Генерирует имя для файла-копии, добавляет постфикс "- copy" при необходимости
+// Р“РµРЅРµСЂРёСЂСѓРµС‚ РёРјСЏ РґР»СЏ С„Р°Р№Р»Р°-РєРѕРїРёРё, РґРѕР±Р°РІР»СЏРµС‚ РїРѕСЃС‚С„РёРєСЃ "- copy" РїСЂРё РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё
 filesystem::path FileCopier::generateNameForOutputFile(const filesystem::path& path, const filesystem::path& filename) const {
 	filesystem::path copyFilename;
 	if (filesystem::exists(path / filename)) {
@@ -24,7 +24,7 @@ filesystem::path FileCopier::generateNameForOutputFile() const {
 	return generateNameForOutputFile(pathTo, pathFrom.filename());
 }
 
-// Возвращает объем доступного свободного пространства на диске, указанном в path
+// Р’РѕР·РІСЂР°С‰Р°РµС‚ РѕР±СЉРµРј РґРѕСЃС‚СѓРїРЅРѕРіРѕ СЃРІРѕР±РѕРґРЅРѕРіРѕ РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІР° РЅР° РґРёСЃРєРµ, СѓРєР°Р·Р°РЅРЅРѕРј РІ path
 long long FileCopier::freeSpaceOnDisk(const filesystem::path& path) const {
 	BOOL  fResult;
 	unsigned __int64 i64FreeBytesToCaller,
@@ -41,14 +41,14 @@ long long FileCopier::freeSpaceOnDisk(const filesystem::path& path) const {
 	return -1;
 }
 
-// Закрывает потоки ввода/вывода и удаляет созданный выходной файл
+// Р—Р°РєСЂС‹РІР°РµС‚ РїРѕС‚РѕРєРё РІРІРѕРґР°/РІС‹РІРѕРґР° Рё СѓРґР°Р»СЏРµС‚ СЃРѕР·РґР°РЅРЅС‹Р№ РІС‹С…РѕРґРЅРѕР№ С„Р°Р№Р»
 void FileCopier::stopCopying() {
 	in.close();
 	out.close();
 	filesystem::remove(outputFilePath);
 }
 
-// Выводит в консоль прогресс копирования, если он изменен
+// Р’С‹РІРѕРґРёС‚ РІ РєРѕРЅСЃРѕР»СЊ РїСЂРѕРіСЂРµСЃСЃ РєРѕРїРёСЂРѕРІР°РЅРёСЏ, РµСЃР»Рё РѕРЅ РёР·РјРµРЅРµРЅ
 void FileCopier::showProgress() {
 	clearAndShow("Copy progress: " + 
 		to_string(convertSize(copiedBytesCount, 1024 * 1024)) + 
@@ -56,14 +56,14 @@ void FileCopier::showProgress() {
 		"MB(100%)\n(press 'Q' to stop copying)\n");
 }
 
-// Очищает консоль и выводит строку
+// РћС‡РёС‰Р°РµС‚ РєРѕРЅСЃРѕР»СЊ Рё РІС‹РІРѕРґРёС‚ СЃС‚СЂРѕРєСѓ
 void FileCopier::clearAndShow(string str) {
 	clear();
 	cout << str;
 }
 
-// Слушает поток ввода и изменяет флаги в разделяемой потоками структуре, чтобы оповестить другой
-// поток о нажатии на кнопку команды 
+// РЎР»СѓС€Р°РµС‚ РїРѕС‚РѕРє РІРІРѕРґР° Рё РёР·РјРµРЅСЏРµС‚ С„Р»Р°РіРё РІ СЂР°Р·РґРµР»СЏРµРјРѕР№ РїРѕС‚РѕРєР°РјРё СЃС‚СЂСѓРєС‚СѓСЂРµ, С‡С‚РѕР±С‹ РѕРїРѕРІРµСЃС‚РёС‚СЊ РґСЂСѓРіРѕР№
+// РїРѕС‚РѕРє Рѕ РЅР°Р¶Р°С‚РёРё РЅР° РєРЅРѕРїРєСѓ РєРѕРјР°РЅРґС‹ 
 void FileCopier::listenCommand(CommandFlags& cm) {
 	while (true) {
 		switch (toupper(_getch())) {
@@ -98,13 +98,13 @@ void FileCopier::run() {
 		throw logic_error("File: " + outputFilePath.string() + " cannot be opened for writing\n");
 	}
 
-	// Если файл пустой, то копирование уже завершено
+	// Р•СЃР»Рё С„Р°Р№Р» РїСѓСЃС‚РѕР№, С‚Рѕ РєРѕРїРёСЂРѕРІР°РЅРёРµ СѓР¶Рµ Р·Р°РІРµСЂС€РµРЅРѕ
 	if (inputFileSize == 0) {
 		cout << "File copied successfully\n";
 		return;
 	}
 
-	//	проверка, хватает ли памяти на диске
+	//	РїСЂРѕРІРµСЂРєР°, С…РІР°С‚Р°РµС‚ Р»Рё РїР°РјСЏС‚Рё РЅР° РґРёСЃРєРµ
 	long long freeSpace = freeSpaceOnDisk(pathTo);
 	if (freeSpace < inputFileSize) {
 		string errStr("");
@@ -120,17 +120,17 @@ void FileCopier::run() {
 		throw runtime_error("Error occurred while checking disk and file sizes\n");
 	}
 
-	// Поток, слушающий ввод команд
+	// РџРѕС‚РѕРє, СЃР»СѓС€Р°СЋС‰РёР№ РІРІРѕРґ РєРѕРјР°РЅРґ
 	CommandFlags commandFlags({ Commands::stopCopying, Commands::continueCopying });
 	thread th(&FileCopier::listenCommand, this, ref(commandFlags));
 	th.detach();
 
 	showProgress();
 
-	// Копирование
+	// РљРѕРїРёСЂРѕРІР°РЅРёРµ
 	while (in) {
-		// Если памяти в процессе копирования перестанет хватать, то будет предложение либо выйти, либо освободить память
-		// и продолжить копирование
+		// Р•СЃР»Рё РїР°РјСЏС‚Рё РІ РїСЂРѕС†РµСЃСЃРµ РєРѕРїРёСЂРѕРІР°РЅРёСЏ РїРµСЂРµСЃС‚Р°РЅРµС‚ С…РІР°С‚Р°С‚СЊ, С‚Рѕ Р±СѓРґРµС‚ РїСЂРµРґР»РѕР¶РµРЅРёРµ Р»РёР±Рѕ РІС‹Р№С‚Рё, Р»РёР±Рѕ РѕСЃРІРѕР±РѕРґРёС‚СЊ РїР°РјСЏС‚СЊ
+		// Рё РїСЂРѕРґРѕР»Р¶РёС‚СЊ РєРѕРїРёСЂРѕРІР°РЅРёРµ
 		if (!out) {
 			uintmax_t leftToCopy = inputFileSize - copiedBytesCount;
 			uintmax_t outputDiskSpace = freeSpaceOnDisk(outputFilePath);
@@ -160,7 +160,7 @@ void FileCopier::run() {
 			continue;
 		}
 
-		// Если нажата клавиша Q, то уже скопированные данные удаляются
+		// Р•СЃР»Рё РЅР°Р¶Р°С‚Р° РєР»Р°РІРёС€Р° Q, С‚Рѕ СѓР¶Рµ СЃРєРѕРїРёСЂРѕРІР°РЅРЅС‹Рµ РґР°РЅРЅС‹Рµ СѓРґР°Р»СЏСЋС‚СЃСЏ
 		if (commandFlags.getCommandFlag(Commands::stopCopying)) {
 			stopCopying();
 			clearAndShow("Copy canceled\n");
@@ -170,7 +170,7 @@ void FileCopier::run() {
 		in.read(buf.get(), bufSize);
 		out.write(buf.get(), in.gcount());
 
-		// Вывод прогресса копирования
+		// Р’С‹РІРѕРґ РїСЂРѕРіСЂРµСЃСЃР° РєРѕРїРёСЂРѕРІР°РЅРёСЏ
 		copiedBytesCount += in.gcount();
 		unsigned copyPercentage = copiedBytesCount / onePercentOfInputFile;
 		if (copyPercentage > copyProgress) {
