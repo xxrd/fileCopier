@@ -5,6 +5,8 @@
 #include <iostream>
 #include <conio.h>
 #include <thread>
+#include "Timer.h"
+#include <sstream>
 
 // Генерирует имя для файла-копии, добавляет постфикс "- copy" при необходимости
 filesystem::path FileCopier::generateNameForOutputFile(const filesystem::path& path, const filesystem::path& filename) const {
@@ -48,16 +50,21 @@ void FileCopier::stopCopying() {
 	filesystem::remove(outputFilePath);
 }
 
-// Выводит в консоль прогресс копирования, если он изменен
-void FileCopier::showProgress() {
-	clearAndShow("Copy progress: " + 
-		to_string(convertSize(copiedBytesCount, 1024 * 1024)) + 
-		"MB(" + to_string(copyProgress) + "%) of " + to_string(convertSize(inputFileSize, 1024 * 1024)) + 
-		"MB(100%)\n(press 'Q' to stop copying)\n");
+// Выводит в консоль прогресс копирования, скорость и время до окончания копирования
+void FileCopier::showProgress() const {
+	clear();
+	stringstream s;
+	s << fixed << setprecision(2) <<
+		"Copy progress: " << convertSize(copiedBytesCount, 1024 * 1024) << "MB("
+		<< copyProgress << "%) of " << convertSize(inputFileSize, 1024 * 1024) << "MB(100%)\n"
+		<< "data rate: " << convertSize(dataRate, 1024 * 1024) << " MB/S, "
+		<< "approximate time to finish: " << convertSize(getTimeToStopCopying(), 60) << " minutes\n"
+		<< "\n(press 'Q' to stop copying)\n";
+	cout << s.str();
 }
 
 // Очищает консоль и выводит строку
-void FileCopier::clearAndShow(string str) {
+void FileCopier::clearAndShow(string str) const {
 	clear();
 	cout << str;
 }
@@ -75,6 +82,24 @@ void FileCopier::listenCommand(CommandFlags& cm) {
 			break;
 		}
 	}
+}
+
+// Обновляет таймеры и скорость передачи
+void FileCopier::updateDataRate() {
+	const int oneSecond = 1;
+	const int threeSeconds = 3;
+
+	if (timer.elapsed() >= threeSeconds) {
+		timer.reset();
+	}
+	else if (timer.elapsed() >= oneSecond) {
+		dataRate = copiedBytesCount / ((int)timerFromStartCopying.elapsed());
+	}
+}
+
+// Возвращает время до окончания копирования
+double FileCopier::getTimeToStopCopying() const {
+	return (inputFileSize - copiedBytesCount) / dataRate;
 }
 
 FileCopier::FileCopier(filesystem::path pathFrom, filesystem::path pathTo)
@@ -104,7 +129,7 @@ void FileCopier::run() {
 		return;
 	}
 
-	//	проверка, хватает ли памяти на диске
+	// Проверка, хватает ли памяти на диске
 	long long freeSpace = freeSpaceOnDisk(pathTo);
 	if (freeSpace < inputFileSize) {
 		string errStr("");
@@ -128,7 +153,13 @@ void FileCopier::run() {
 	showProgress();
 
 	// Копирование
+	timerFromStartCopying.reset();
+	timer.reset();
 	while (in) {
+		
+		// Обновляет скорость передачи
+		updateDataRate();
+
 		// Если памяти в процессе копирования перестанет хватать, то будет предложение либо выйти, либо освободить память
 		// и продолжить копирование
 		if (!out) {

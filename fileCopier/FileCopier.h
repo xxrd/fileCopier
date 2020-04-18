@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <fstream>
 #include "CommandFlags.h"
+#include "Timer.h"
 
 using namespace std;
 
@@ -19,7 +20,9 @@ private:
 	unsigned copyProgress; // Прогресс копирования
 	uintmax_t copiedBytesCount; // Количество скопированных байт
 	long double onePercentOfInputFile; // Процент от размера входного файла
-
+	Timer timerFromStartCopying; // Таймер, запускаемый при начале копирования
+	Timer timer; // Таймер для определения скорости передачи
+	double dataRate; // Скорость передачи данных
 
 	// Генерирует имя для файла-копии, добавляет постфикс "- copy" при необходимости
 	filesystem::path generateNameForOutputFile(const filesystem::path& path, const filesystem::path& filename) const;
@@ -33,14 +36,20 @@ private:
 	void stopCopying();
 
 	// Выводит в консоль прогресс копирования, если он изменен
-	void showProgress();
+	void showProgress() const;
 
 	// Очищает консоль и выводит строку
-	void clearAndShow(string str);
+	void clearAndShow(string str) const;
 
 	// Слушает поток ввода и изменяет флаги в разделяемой потоками структуре, чтобы оповестить другой
 	// поток о нажатии на кнопку команды 
 	void listenCommand(CommandFlags& cm);
+
+	// Обновляет таймеры и скорость передачи
+	void updateDataRate();
+
+	// Возвращает время до окончания копирования
+	double getTimeToStopCopying() const;
 
 public:
 	FileCopier(filesystem::path pathFrom, filesystem::path pathTo);
